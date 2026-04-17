@@ -18,13 +18,19 @@ No proot. No Ubuntu container. No extra 300MB overhead. Just Termux + a tiny Nod
 
 ## Why This Matters
 
-| | proot + Ubuntu (common method) | Native Termux (this guide) |
-|---|---|---|
-| Boot time | 10–30 seconds | ~2 seconds |
-| Extra RAM usage | ~300MB+ for Ubuntu layer | Minimal |
-| OpenClaw responsiveness | Slow, laggy | Fast, snappy |
-| Setup complexity | High | Low |
-| Root required | No | No |
+|                         | proot + Ubuntu (common method) | Native Termux (this guide) |
+| ----------------------- | ------------------------------ | -------------------------- |
+| Boot time               | 10–30 seconds                  | ~2 seconds                 |
+| Extra RAM usage         | ~300MB+ for Ubuntu layer       | Minimal                    |
+| OpenClaw responsiveness | Slow, laggy                    | Fast, snappy               |
+| Setup complexity        | High                           | Low                        |
+| Root required           | No                             | No                         |
+
+---
+
+## Full Setup Guide
+
+👉 **[docs/SETUP.md](./docs/SETUP.md)** — Complete step-by-step installation
 
 ---
 
@@ -36,12 +42,6 @@ Once OpenClaw is running natively on your Android device, you can build:
 - 📷 **Kitchen Surveillance** — AI agent monitors your kitchen camera feed 24/7
 - 🎟️ **Movie Ticket Booking Bot** — agent navigates BookMyShow and books tickets autonomously
 - 🔄 **Always-on AI Gateway** — turn an old Android phone into a 24/7 agent server
-
----
-
-## Full Setup Guide
-
-👉 **[docs/SETUP.md](./docs/SETUP.md)** — Complete step-by-step installation
 
 ---
 
