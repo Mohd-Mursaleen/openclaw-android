@@ -11,6 +11,7 @@ These are real things built using this native Termux setup. No emulators. No clo
 An OpenClaw skill that uses the ADB bridge to control any app on the phone — tap, swipe, type, read screen state, launch apps.
 
 What it can do:
+
 - Navigate any Android app autonomously
 - Extract UI state and make decisions based on it
 - Perform multi-step workflows (e.g., open app → search → tap result → confirm)
@@ -22,9 +23,10 @@ OpenClaw receives a natural language instruction → skill parses it → issues 
 
 ---
 
-## 2. Movie Ticket Booking Bot
+## 2. Android Agent booking movie ticket
 
 OpenClaw agent navigates BookMyShow autonomously:
+
 - Opens the app
 - Searches for a movie
 - Selects show, seats, and payment method
@@ -72,5 +74,6 @@ With OpenClaw running natively on Android + ADB bridge, the surface area is huge
 ## Setup Required
 
 All use cases above require:
+
 1. [Native OpenClaw setup on Termux](../docs/SETUP.md)
 2. [ADB bridge](../docs/ADB-BRIDGE.md) (for app automation use cases)
