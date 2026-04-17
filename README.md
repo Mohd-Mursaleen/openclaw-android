@@ -108,7 +108,7 @@ npm install -g pm2
 
 ---
 
-## Step 5 — Install Messaging Integrations (Optional)
+## Step 5 — Install Messaging Integrations
 
 ```bash
 npm i -g @grammyjs/runner
