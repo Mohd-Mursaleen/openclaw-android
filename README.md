@@ -1,159 +1,78 @@
-# OpenClaw on Android — Native Termux Setup (No Ubuntu, No proot)
+# Run OpenClaw Natively on Android via Termux — No Root, No Ubuntu, No proot
 
-Most people install OpenClaw on Android by running Ubuntu inside Termux via proot-distro.  
-It works — but it's slow, heavy, and laggy.
+> **The fastest way to run an AI agent gateway on any Android phone.**
 
-This is a different approach. **OpenClaw running directly on Termux's native environment.**  
-No proot. No Ubuntu. Just Termux + a small Node.js patch to fix Android's Bionic libc quirks.
+<p align="center">
+  <img src="./public/IMG_0342.JPG" width="320" alt="OpenClaw running on Android phone" />
+</p>
 
-> Tested and built by me. No official docs cover this method.
+Most guides tell you to install Ubuntu inside Termux using proot-distro before running OpenClaw.  
+It works — but it's **slow, bloated, and laggy**.
 
----
+This repo documents a different approach: **OpenClaw running directly on Termux's native environment.**  
+No proot. No Ubuntu container. No extra 300MB overhead. Just Termux + a tiny Node.js patch to fix Android's Bionic libc incompatibilities.
 
-## Why Native Termux?
-
-|                         | proot + Ubuntu           | Native Termux (this guide) |
-| ----------------------- | ------------------------ | -------------------------- |
-| Boot time               | 10–30s                   | ~2s                        |
-| RAM overhead            | ~300MB+ for Ubuntu layer | Minimal                    |
-| OpenClaw responsiveness | Slow, laggy              | Fast, snappy               |
-| Complexity              | High                     | Low                        |
+> Discovered, tested, and documented by [@Mohd-Mursaleen](https://github.com/Mohd-Mursaleen). No official docs cover this method.
 
 ---
 
-## Prerequisites
+## Why This Matters
 
-- Android phone (any, no root needed)
-- F-Droid installed
-- "Allow incompatible versions" enabled in F-Droid settings
-- Termux + Termux:API installed from F-Droid
-- Full permissions granted to both apps
-
----
-
-## Step 1 — SSH Into Your Device
-
-Do this first. Everything after is easier from your laptop keyboard.
-
-```bash
-termux-wake-lock         # prevent Android from killing Termux
-pkg update && pkg upgrade -y
-pkg install openssh -y
-sshd                     # start SSH server on port 8022
-whoami                   # note your username
-ifconfig                 # note your WLAN IP
-passwd                   # set a password
-```
-
-From your laptop:
-
-```bash
-ssh -p 8022 <username>@<wlan-ip>
-```
+| | proot + Ubuntu (common method) | Native Termux (this guide) |
+|---|---|---|
+| Boot time | 10–30 seconds | ~2 seconds |
+| Extra RAM usage | ~300MB+ for Ubuntu layer | Minimal |
+| OpenClaw responsiveness | Slow, laggy | Fast, snappy |
+| Setup complexity | High | Low |
+| Root required | No | No |
 
 ---
 
-## Step 2 — Install Node.js & Git
+## What You Can Build With This
 
-```bash
-pkg install nodejs -y
-pkg install git -y
-```
+Once OpenClaw is running natively on your Android device, you can build:
 
----
-
-## Step 3 — Bionic Bypass (The Key Fix)
-
-Android's Bionic libc causes two Node.js crashes:
-
-1. `os.networkInterfaces()` crashes or returns null
-2. `os.homedir()` returns a wrong path
-
-This patch fixes both at Node startup, injected via `NODE_OPTIONS`.
-
-```bash
-mkdir -p ~/.openclaw
-cat > ~/.openclaw/bionic-bypass.js << 'EOF'
-const os = require('os');
-
-const _ni = os.networkInterfaces.bind(os);
-os.networkInterfaces = function() {
-  try {
-    const r = _ni();
-    if (r && Object.keys(r).length > 0) return r;
-  } catch(e) {}
-  return { lo: [{ address: '127.0.0.1', netmask: '255.0.0.0', family: 'IPv4', mac: '00:00:00:00:00:00', internal: true, cidr: '127.0.0.1/8' }] };
-};
-
-const _hd = os.homedir.bind(os);
-os.homedir = function() {
-  return process.env.HOME || _hd();
-};
-EOF
-
-echo 'export NODE_OPTIONS="--require /data/data/com.termux/files/home/.openclaw/bionic-bypass.js --max-old-space-size=5632"' >> ~/.bashrc
-source ~/.bashrc
-```
+- 📱 **Android Automation Agents** — control any app via ADB + AI ([see repo](https://github.com/Mohd-Mursaleen/android-automation-agent))
+- 📷 **Kitchen Surveillance** — AI agent monitors your kitchen camera feed 24/7
+- 🎟️ **Movie Ticket Booking Bot** — agent navigates BookMyShow and books tickets autonomously
+- 🔄 **Always-on AI Gateway** — turn an old Android phone into a 24/7 agent server
 
 ---
 
-## Step 4 — Install OpenClaw
+## Full Setup Guide
 
-```bash
-npm install -g openclaw@2026.4.5 --ignore-scripts
-npm install -g pm2
-```
-
-`--ignore-scripts` skips postinstall scripts that break on Android.
+👉 **[docs/SETUP.md](./docs/SETUP.md)** — Complete step-by-step installation
 
 ---
 
-## Step 5 — Install Messaging Integrations
+## Android Automation via ADB
 
-```bash
-npm i -g @grammyjs/runner
-npm i -g @grammyjs/transformer-throttler
-npm i -g @larksuiteoapi/node-sdk
-npm install -g @buape/carbon
-npm install -g @slack/web-api
-npm install -g grammy
-```
+Want your OpenClaw agent to control other apps on the phone?  
+You need to bridge Termux to the Android OS via ADB.
+
+👉 **[docs/ADB-BRIDGE.md](./docs/ADB-BRIDGE.md)** — ADB setup guide
 
 ---
 
-## Step 6 — Run OpenClaw Gateway with PM2
+## Use Cases
 
-```bash
-cat > ~/start.sh << 'EOF'
-#!/data/data/com.termux/files/usr/bin/bash
-source ~/.bashrc
-openclaw gateway
-EOF
+Real things built with this setup:
 
-chmod +x ~/start.sh
-pm2 start ~/start.sh --name "gateway"
-pm2 save
-```
+👉 **[docs/USE-CASES.md](./docs/USE-CASES.md)** — Android automation, kitchen surveillance, ticket booking
 
 ---
 
-## Step 7 — Onboard
+## Related
 
-```bash
-openclaw onboard
-```
-
----
-
-## More Coming Soon
-
-- Android Automation Agent setup
-- Kitchen Surveillance use case with OpenClaw
-- Multi-device agent fleet on old Android phones
+- [android-automation-agent](https://github.com/Mohd-Mursaleen/android-automation-agent) — ADB-powered Android automation skill for OpenClaw
+- [OpenClaw](https://openclaw.ai) — The AI agent gateway this setup runs
 
 ---
 
-## Author
+## Keywords
 
-Built by [Mohd Mursaleen](https://github.com/your-handle)  
-If this helped you, drop a ⭐
+`openclaw` `android` `termux` `ai-agent` `no-root` `no-proot` `llm` `agent-gateway` `android-automation` `adb` `nodejs-android` `termux-setup` `self-hosted-ai` `mobile-ai`
+
+---
+
+<p align="center">If this helped you, drop a ⭐ — it helps others find this.</p>
